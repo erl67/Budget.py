@@ -1,0 +1,102 @@
+html, body {
+	margin: 0 auto;
+	padding: 1em;
+	width: 95%;
+	margin: 0 auto;
+	box-sizing: border-box;
+	display: flex; 
+	flex-direction: column;
+	justify-content: space-evenly;
+	align-items: center;
+    font-weight: bold;
+}
+#page-main {
+	min-width: 50vw;
+	min-height: 50vh;
+}
+h1, h2, h3, h4, h5, h6{
+	text-align: center;
+}
+div {
+	padding: 1em;
+	margin: .5em;
+}
+#sidebar {
+	position:fixed;
+    top:0;
+    left:0;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+	font-size: smaller;
+	padding: 1.5em;
+	border: 1px dashed grey;
+}
+#sidebar > a {
+	margin-top: .5em;
+	margin-bottom: 1em;
+}
+#sidebar > a:first-of-type {
+	font-size:smaller;
+	margin-bottom: 1.5em;
+}
+a {
+	color: inherit;
+	text-decoration: underline;
+	font-size: larger;
+}
+a:hover {
+	color: inherit;
+	background: #ddd;
+	text-decoration: none;
+}
+.transaction-list {
+	border: 1px dashed #c0c0c0;
+}
+ul {
+	display: flex; 
+	flex-direction: column;
+	justify-content: space-between;
+}
+li {
+	display: flex; 
+	flex-direction: row;
+	justify-content: space-between;
+}
+.flashes {
+	margin-top: 0;
+	margin-left: 1em;
+	margin-bottom: 3em;
+	font-variant: small-caps;
+	box-shadow:0px 0px 3em 2em #b06259 ;
+	padding: 1.5em;
+	list-style-type: circle;
+}
+input:valid {
+	background-color: rgba(157, 223, 154, 0.9);
+}
+input:invalid {
+	background-color: rgba(225, 85, 85, 0.7);
+}
+input {
+	margin-top: 1em;
+	margin-bottom: 2em;
+	padding: .3em;
+	text-align: center;
+}
+input[type=submit], button {
+	font-size: 1.2em;
+	background-color: buttonface;
+	css: -webkit-appearance: none;
+}
+input:focus {
+	background-color: rgba(239, 238, 203, 0.9);
+}
+form {
+	text-align: center;
+	display: grid;
+	margin: 2em;
+}
+.table-primary > td, .table-secondary > td {
+	color: #000;
+}

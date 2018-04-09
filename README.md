@@ -1,12 +1,12 @@
 # Money on my Mind, and my mind on my REST API -- <Replace with your name>
 
-Name: <Full Name>
-Pitt ID: <ID>
+Name: Eric Laslo
+Pitt ID: Erl67@pitt.edu
 
 ## Installation
 
-1. Instructions to get your code up and running.
+1. Set Flask_APP=????.py, flask initdb, flask run
 
 ## Running the App
 
-1. Instructions to run your application.
+1. Go to 127.0.0.1:5000
