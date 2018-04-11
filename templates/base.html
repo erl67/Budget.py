@@ -8,12 +8,13 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <link rel="stylesheet" type="text/css" href="/static/style.css?{{ range(0, 99999) | random  }}">
 <script src="/static/color.js" type="text/javascript"></script>
+<script src="/static/ajax.js" type="text/javascript"></script>
 <title>{% block title %}ERL67 Budgeting{% endblock %}</title>
 {% block head %}
 {% endblock %}
 </head>
 <body id="container" class="container">
-<div class="col-2 sticky-top" id="sidebar">
+<div class="col-3 sticky-top border border-dark rounded-left text-center" id="sidebar">
   {% with messages = get_flashed_messages() %}
 	{% if messages %}
 		<ul class="flashes" id="flashbox">
@@ -28,6 +29,12 @@
 
     <a href="{{ url_for('index') }}">index</a>
     <a href="{{ url_for('rawstats') }}">raw data</a>
+    
+    <a href="{{ url_for('cats') }}">c</a>
+    <a href="{{ url_for('trans') }}">t</a>
+    <a href="{{ url_for('budgetall')}}">b</a>
+    <a href="{{ url_for('save_data')}}">save data</a>
+    <a href="{{ url_for('read_data')}}">load data</a>
     
 </div>
 

@@ -5,6 +5,7 @@ FDEBUG = True
 import os, re, json
 from sys import stderr
 from flask import Flask, g, send_from_directory, flash, render_template, abort, request, redirect, url_for, session, Response, jsonify
+from flask_restful import Resource, Api
 from flask_debugtoolbar import DebugToolbarExtension
 from datetime import datetime, date, timedelta
 from dateutil import parser
@@ -16,12 +17,12 @@ budget = dict()
 
 def create_app():
     app = Flask(__name__)
-    DB_NAME = os.path.join(app.root_path, 'budget.txt')
+    DB_NAME = os.path.join(app.root_path, 'data/budget.txt')
     
     app.config.update(dict(
         SECRET_KEY='erl67_',
         TEMPLATES_AUTO_RELOAD=True,
-        USE_threaded = True,
+        USE_THREADED = True,
     ))
         
     if REBUILD_DB == True and os.access(DB_NAME, os.W_OK):
@@ -30,25 +31,66 @@ def create_app():
         
     if os.access(DB_NAME, os.W_OK):
         print('DB Exists')
-        data = open(DB_NAME)
-        budget = json.load(data)
-        data.close() 
     else:
-        app.app_context().push()
-        budget = dict()
-        print('DB Created')
+        print('DB does not exist')
+        
     print(app.__str__(), end="  ")
     return app
 
 app = create_app()
+api = Api(app)
 
-# @app.route("/save")
-@app.cli.command('initdb')
-def initdb_command():
-    fh = open(DB_NAME,"w")
-    json.dump(budget, fh)
-    fh.close()
-    print('Initialized the database.')
+class cats(Resource):    
+    def get(self):
+        return categories
+    
+    def put(self, category=None):
+        category = request.json['category']
+        eprint(str(category))
+        categories[str(len(categories))] = category
+        flash("category added : " + str(category))
+        return {}, 204
+    
+    def delete(self, category=None):
+        category = request.json['category']
+        del categories[category]
+        flash("category removed : " + str(category))
+        return {}, 204
+    
+class trans(Resource):
+    def get(self):
+        return transactions
+    
+class budgetAll(Resource):
+    def get(self):
+        return budget
+    
+api.add_resource(cats, '/c')
+api.add_resource(trans, '/t')
+api.add_resource(budgetAll, '/b')
+    
+@app.route("/save")
+def save_data():
+    with open('data/categories.txt', 'w') as fh:
+        json.dump(g.categories, fh, indent=1)
+    with open('data/budget.txt', 'w') as fh:
+        json.dump(g.budget, fh, indent=1)
+    with open('data/transactions.txt', 'w') as fh:
+        json.dump(g.transactions, fh, indent=1)
+    flash("Data saved to file")
+    return redirect(url_for("index"))
+
+@app.route("/open")
+def read_data():
+    global categories, budget, transactions
+    with open('data/categories.txt', 'r') as fh:
+        categories = json.load(fh)
+    with open('data/budget.txt', 'r') as fh:
+        budget = json.load(fh)
+    with open('data/transactions.txt', 'r') as fh:
+        transactions = json.load(fh)
+    flash("Data loaded from file")
+    return redirect(url_for("index"))
     
 @app.before_request
 def before_request():
@@ -58,7 +100,6 @@ def before_request():
     eprint("g.budget: " + str(g.budget))
     eprint("g.trans: " + str(g.transactions))
     eprint("g.cats: " + str(g.categories))
-    
         
 @app.before_first_request
 def before_first_request():
@@ -67,11 +108,11 @@ def before_first_request():
 @app.route("/db/")
 def rawstats():
     msg = ""
-    msg += json.dumps(budget)
+    msg += str(budget)
     msg += "\n\n"
-    msg += json.dumps(categories)
+    msg += str(categories)
     msg += "\n\n"
-    msg += json.dumps(transactions)
+    msg += str(transactions)
     msg += "\n\n"
     return Response(render_template('test.html', testMessage=msg), status=203, mimetype='text/html')
 
@@ -79,65 +120,9 @@ def rawstats():
 def index():
     return Response(render_template('index.html'), status=200, mimetype='text/html')
 
-@app.route('/r')
-def get_room():
-    if g.user:
-        return json.dumps(g.user.currentroom, default=json_serial)
-    else:
-        abort(404)
-        
-@app.route('/u')
-def get_user():
-    if g.user:
-        return json.dumps(g.user.username, default=json_serial)
-    else:
-        abort(404)
-        
-@app.route("/chats")
-def get_chats():
-    if g.user:
-        chatsJSON = Chat.as_json(g.user.currentroom)
-        chats = len(chatsJSON)
-        if chats == 0:
-            flash("room no longer exists")
-            return redirect(url_for("index"))
-        else:
-            return str(chats)
-    else:
-        abort(404)
-
-@app.route("/updates/<int:count>", methods=["POST"]) 
-def get_updates(count=None):
-    if g.user:
-        updates = Chat.as_jsonUpdates(g.user.currentroom, count)
-        eprint("updates" + str(updates))
-        return json.dumps(updates, default=json_serial)
-    else:
-        abort(404)
-
-@app.route('/chat')
-def get_chat():
-    return json.dumps(g.jchats, default=json_serial)
-
-@app.route("/new_msg", methods=["POST"])
-def add():
-    eprint(str(request.json))
-    message = request.json["msg"]
-    message = remove_tags(message)
-    newChat = Chat(g.user.currentroom, g.user.id, None, message)
-    db.session.add(newChat)
-    try:
-        db.session.commit()
-        flash ("Message received")
-        return ('', 204)
-    except Exception as e:
-        db.session.rollback()
-        flash("Error receiving message")
-        return ('', 510)
-
-@app.route('/ajax.js')
-def ajax():
-    return Response(render_template('ajax.js'), status=200, mimetype='application/javascript')
+# @app.route('/ajax.js')
+# def ajax():
+#     return Response(render_template('ajax.js'), status=200, mimetype='application/javascript')
 
 @app.errorhandler(403)
 @app.errorhandler(404)
