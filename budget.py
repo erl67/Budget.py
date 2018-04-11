@@ -1,112 +1,78 @@
 #erl67
-REBUILD_DB = True
+REBUILD_DB = False
 FDEBUG = True
 
 import os, re, json
 from sys import stderr
 from flask import Flask, g, send_from_directory, flash, render_template, abort, request, redirect, url_for, session, Response, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
-from sqlalchemy import or_
 from datetime import datetime, date, timedelta
 from dateutil import parser
 from random import getrandbits
-from models import db, populateDB, User, Room, Chat
+
+transactions = dict()
+categories = dict()
+budget = dict()
 
 def create_app():
     app = Flask(__name__)
-    DB_NAME = os.path.join(app.root_path, 'budget.db')
+    DB_NAME = os.path.join(app.root_path, 'budget.txt')
     
     app.config.update(dict(
-        SQLALCHEMY_TRACK_MODIFICATIONS=False,
         SECRET_KEY='erl67_',
         TEMPLATES_AUTO_RELOAD=True,
         USE_threaded = True,
-        SQLALCHEMY_DATABASE_URI='sqlite:///' + DB_NAME
     ))
-    
-    db.init_app(app)
-    
+        
     if REBUILD_DB == True and os.access(DB_NAME, os.W_OK):
         os.remove(DB_NAME)
         print('DB Dropped')
         
     if os.access(DB_NAME, os.W_OK):
         print('DB Exists')
+        data = open(DB_NAME)
+        budget = json.load(data)
+        data.close() 
     else:
         app.app_context().push()
-        db.drop_all()
-        db.create_all()
+        budget = dict()
         print('DB Created')
-        populateDB()
     print(app.__str__(), end="  ")
     return app
 
 app = create_app()
 
+# @app.route("/save")
 @app.cli.command('initdb')
 def initdb_command():
-    db.drop_all()
-    db.create_all()
-    populateDB()
+    fh = open(DB_NAME,"w")
+    json.dump(budget, fh)
+    fh.close()
     print('Initialized the database.')
     
 @app.before_request
 def before_request():
-    g.user = None
-    g.rooms = None
-    g.chats = None
-    g.jchats = None
-    g.others = None
-    if 'uid' in session:
-        g.user = User.query.filter_by(id=session['uid']).first()
-        if g.user != None:
-            g.rooms = Room.query.order_by(Room.lastmessage.asc()).all()
-            if g.user.currentroom > 0:
-                g.chats = Chat.query.filter(Chat.room == g.user.currentroom).order_by(Chat.created.asc()).all()
-                g.jchats = Chat.as_json(g.user.currentroom)
-                g.others = [u.username for u in User.query.filter(User.currentroom == g.user.currentroom).all()]
-            else:
-                g.chats = Chat.query.limit(10).all()
-                g.jchats = Chat.as_json()
-#     eprint("g.user: " + str(g.user))
-#     eprint("g.rooms: " + str(g.rooms))
-#     eprint("g.chats: " + str(g.chats))
-#     eprint("g.jchats: " + str(g.jchats))
-#     eprint("g.others: " + str(g.others))
+    g.budget = budget
+    g.transactions = transactions
+    g.categories = categories
+    eprint("g.budget: " + str(g.budget))
+    eprint("g.trans: " + str(g.transactions))
+    eprint("g.cats: " + str(g.categories))
     
         
 @app.before_first_request
 def before_first_request():
     eprint("    🥇")
     
-@app.context_processor
-def utility_processor():
-    def getName(id):
-        user = User.query.filter(User.id==id).first()
-        if user != None:
-            return user.username
-        else:
-            return ""
-    return dict(getName=getName)
-
-@app.context_processor
-def utility_processor():
-    def getRoom(id):
-        room = Room.query.filter(Room.id==id).first()
-        if room != None:
-            return room.roomname
-        else:
-            return ""
-    return dict(getRoom=getRoom)
-    
 @app.route("/db/")
 def rawstats():
     msg = ""
-    msg += User.Everything()
+    msg += json.dumps(budget)
     msg += "\n\n"
-    msg += Room.Everything()
+    msg += json.dumps(categories)
     msg += "\n\n"
-    msg += Chat.Everything()
+    msg += json.dumps(transactions)
+    msg += "\n\n"
     return Response(render_template('test.html', testMessage=msg), status=203, mimetype='text/html')
 
 @app.route('/')
@@ -212,7 +178,6 @@ if __name__ == "__main__":
         app.config.update(dict(
             DEBUG=True,
             DEBUG_TB_INTERCEPT_REDIRECTS=False,
-            SQLALCHEMY_TRACK_MODIFICATIONS=True,
             TEMPLATES_AUTO_RELOAD=True,
         ))
         app.jinja_env.auto_reload = True
