@@ -3,11 +3,11 @@ FDEBUG = True
 
 import os, re, json, pickle
 from sys import stderr
-from flask import Flask, g, send_from_directory, flash, render_template, abort, request, redirect, url_for, Response, jsonify
+from flask import Flask, g, send_from_directory, flash, render_template, abort, request, redirect, url_for, Response
 from flask_restful import Resource, Api
 from flask_debugtoolbar import DebugToolbarExtension
-from datetime import datetime, date, timedelta
-from dateutil import parser
+# from datetime import datetime, date, timedelta
+# from dateutil import parser
 from random import getrandbits
 
 transactions = dict()
@@ -32,14 +32,14 @@ class cats(Resource):
     def get(self):
         return categories, 200
     
-    def put(self, category=None):
+    def post(self):
         category = request.json['category']
         eprint(str(category))
         categories[str(len(categories))] = category
         flash("category added : " + str(category))
         return {}, 201
     
-    def delete(self, category=None):
+    def delete(self):
         category = request.json['category']
         del categories[category]
         flash("category removed : " + str(category))
@@ -49,8 +49,8 @@ class trans(Resource):
     def get(self):
         return transactions, 200
     
-api.add_resource(cats, '/c')
-api.add_resource(trans, '/t')
+api.add_resource(cats, '/api/cats')
+api.add_resource(trans, '/api/transactions')
     
 @app.route("/save")
 def save_data():
@@ -86,6 +86,10 @@ def before_first_request():
 def index():
     return Response(render_template('index.html'), status=200, mimetype='text/html')
 
+@app.route('/review')
+def review():
+    return Response(render_template('analysis.html'), status=200, mimetype='text/html')
+
 @app.errorhandler(403)
 @app.errorhandler(404)
 def page_not_found(error):
@@ -113,11 +117,11 @@ TAG_RE = re.compile(r'<[^>]+>')
 def remove_tags(text):
     return TAG_RE.sub('', text)
 
-def json_serial(obj):
-    """JSON serializer for objects not serializable by default json code stackoverflow.com/a/22238613/7491839 """
-    if isinstance(obj, (datetime, date)):
-        return obj.isoformat()
-    raise TypeError ("Type %s not serializable" % type(obj))
+# def json_serial(obj):
+#     """JSON serializer for objects not serializable by default json code stackoverflow.com/a/22238613/7491839 """
+#     if isinstance(obj, (datetime, date)):
+#         return obj.isoformat()
+#     raise TypeError ("Type %s not serializable" % type(obj))
     
 if __name__ == "__main__":
     print('Starting......')

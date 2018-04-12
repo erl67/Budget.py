@@ -1,41 +1,42 @@
 //erl67
-var timeoutID;
-var timeout = 1000;
-var currentMsgs = 0;
-var newMsgs = 0;
-var button;
-var textarea;
-var select;
-var categories;
+var buttons, addBtn, delBtn, addXBtn, delXBtn;
+var delCatDiv, addCat, selectCat;
+var delXDiv, xSelectCat, xName, xDate, xTotal;
+var categories, transactions;
 
 document.addEventListener("DOMContentLoaded", function() {
-	var buttons = document.getElementsByTagName("button");
-	
-	switch(buttons.length) { //just use ID jfc
-	    case 1:
-	    	buttons[0].addEventListener("click", sendCat, true);
-	        break;
-	    case 2:
-	    	buttons[0].addEventListener("click", sendCat, true);
-	    	buttons[1].addEventListener("click", rmCat, true);
-	        break;
-	    default:
-	    	alert("What did you do");
-	}
-
-	textarea = document.getElementsByTagName("input")[0];
-	select = document.getElementsByTagName("select")[0];
-	
-	getCats();
-	
+	window.onload = prepare;
 });
+
+function prepare() {
+	buttons = document.getElementsByTagName("button");
+	
+//	switch(buttons.length) {
+//	    case 2:
+	    	delBtn = document.getElementById("delCatBtn");
+	    	delBtn.addEventListener("click", rmCat, true);
+//    	case 1:
+    		addBtn = document.getElementById("addCatBtn");
+    		addBtn.addEventListener("click", sendCat, true);
+//    		break;
+//	    default:
+//	    	alert("?");
+//	}
+
+	addCat = document.getElementById("addCat");
+	selectCat = document.getElementById("delCat");
+	xSelectCat = document.getElementById("xSelectCat");
+	delCatDiv = document.getElementById("delCatDiv");
+	delXDiv = document.getElementById("delXDiv");
+	updatePage();
+}
 
 function getCats() {
 	var httpRequest = new XMLHttpRequest();
 
 	httpRequest.onreadystatechange = function() { handleGetCats(httpRequest) };
 
-	httpRequest.open("GET", "/c", true);
+	httpRequest.open("GET", "/api/cats", true);
 	httpRequest.setRequestHeader('Content-Type', 'application/json');
 
 	httpRequest.send();
@@ -45,21 +46,24 @@ function handleGetCats(httpRequest) {
 	if (httpRequest.readyState === XMLHttpRequest.DONE) {
 		if (httpRequest.status === 200) {
 	        categories = httpRequest.responseText;
+	        if (categories.length > 5)
+	        	delCatDiv.classList.remove("d-none");
+	        else delCatDiv.classList.add("d-none");
 		} else {
 			alert("There was a problem with the get request.");
 		}
-		console.log(httpRequest.status + httpRequest.responseText);
+		logStatus(httpRequest);
 	}
 }
 
 function sendCat() {
 	var httpRequest = new XMLHttpRequest();
 
-	var cat = textarea.value;
+	var cat = addCat.value;
 
 	httpRequest.onreadystatechange = function() { handleSendCat(httpRequest, cat) };
 
-	httpRequest.open("PUT", "/c", true);
+	httpRequest.open("POST", "/api/cats", true);
 	httpRequest.setRequestHeader('Content-Type', 'application/json');
 
 	var data = new Object();
@@ -72,41 +76,59 @@ function sendCat() {
 function handleSendCat(httpRequest, cat) {
 	if (httpRequest.readyState === XMLHttpRequest.DONE) {
 		if (httpRequest.status === 201) {
-			textarea.value = "";
-			location.reload();
+			addCat.value = "";
+			var option = document.createElement("option");
+			option.text = cat;
+			option.value = selectCat.length;
+			selectCat.add(option);
+			xSelectCat.add(option);
+			updatePage();
 		} else {
 			alert("There was a problem with the put request.");
 		}
-		console.log(httpRequest.status + httpRequest.responseText);
+		logStatus(httpRequest);
 	}
 }
 
 function rmCat() {
 	var httpRequest = new XMLHttpRequest();
 
-	var cat = select.value;
-
-	httpRequest.onreadystatechange = function() { handleRmCat(httpRequest, cat) };
-
-	httpRequest.open("DELETE", "/c", true);
-	httpRequest.setRequestHeader('Content-Type', 'application/json');
-
-	var data = new Object();
-	data.category = cat;
-	data = JSON.stringify(data);
-
-	httpRequest.send(data);
+	var cat = selectCat.value;
+	
+	if (cat) {
+		httpRequest.onreadystatechange = function() { handleRmCat(httpRequest, cat) };
+	
+		httpRequest.open("DELETE", "/api/cats", true);
+		httpRequest.setRequestHeader('Content-Type', 'application/json');
+	
+		var data = new Object();
+		data.category = cat;
+		data = JSON.stringify(data);
+	
+		httpRequest.send(data);
+	}
 }
 
 function handleRmCat(httpRequest, cat) {
 	if (httpRequest.readyState === XMLHttpRequest.DONE) {
 		if (httpRequest.status === 204) {
-			location.reload();
+			selectCat.remove(selectCat.selectedIndex);
+			xSelectCat.remove(selectCat.selectedIndex);
+			updatePage();
 		} else {
 			alert("There was a problem with the delete request.");
 		}
-		console.log(httpRequest.status + httpRequest.responseText);
+		logStatus(httpRequest);
 	}
 }
 
+function logStatus(xhr) {
+	console.log("📡\t" + xhr.status + "\t" + xhr.responseText);
+}
 
+function updatePage() {
+	getCats();
+
+	colorize(['page']);
+	colorizeText(['page'], true);
+}
