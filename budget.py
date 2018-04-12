@@ -42,12 +42,23 @@ class cats(Resource):
     def delete(self):
         category = request.json['category']
         del categories[category]
-        flash("category removed : " + str(category))
+        flash("category " + str(category) + " removed")
         return {}, 204
     
 class trans(Resource):
     def get(self):
         return transactions, 200
+    
+    def put(self):
+        transact = dict()
+        transact['name'] = request.json['name']
+        transact['date'] = request.json['date']
+        transact['total'] = request.json['total']
+        transact['category'] = request.json['category']
+        eprint(str(transact))
+        transactions[str(len(transactions))] = transact
+        flash("transaction added")
+        return {}, 201
     
 api.add_resource(cats, '/api/cats')
 api.add_resource(trans, '/api/transactions')
@@ -76,7 +87,7 @@ def before_request():
     g.transactions = transactions
     g.categories = categories
     eprint("g.trans: " + str(g.transactions))
-    eprint("g.cats: " + str(g.categories))
+#     eprint("g.cats: " + str(g.categories))
         
 @app.before_first_request
 def before_first_request():
@@ -95,9 +106,9 @@ def review():
 def page_not_found(error):
     return Response(render_template('404.html', errno=error), status=404, mimetype='text/html')
 
-@app.errorhandler(405)
-def wrong_method(error):
-    return Response("You shouldn't have done that", status=405, mimetype='text/html')
+# @app.errorhandler(405)
+# def wrong_method(error):
+#     return Response("You shouldn't have done that", status=405, mimetype='text/html')
 
 @app.route('/418/')
 def err418(error=None):

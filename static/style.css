@@ -53,14 +53,14 @@ input, select, option {
 input:focus {
 	background-color: rgba(239, 238, 203, 0.9);
 }
-form, #addCatDiv, #delCatDiv, #addXdiv, #delXDiv {
+#addCatDiv, #delCatDiv, #addXDiv, #delXDiv {
 	margin-top: 3em;
 	text-align: center;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-evenly;
 }
-button, input[type=submit]{
+button {
 	max-width: 50%;
 	margin-left: 25%;
     white-space:normal !important;

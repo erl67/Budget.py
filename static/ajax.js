@@ -11,23 +11,25 @@ document.addEventListener("DOMContentLoaded", function() {
 function prepare() {
 	buttons = document.getElementsByTagName("button");
 	
-//	switch(buttons.length) {
-//	    case 2:
-	    	delBtn = document.getElementById("delCatBtn");
-	    	delBtn.addEventListener("click", rmCat, true);
-//    	case 1:
-    		addBtn = document.getElementById("addCatBtn");
-    		addBtn.addEventListener("click", sendCat, true);
-//    		break;
-//	    default:
-//	    	alert("?");
-//	}
+	delBtn = document.getElementById("delCatBtn");
+	delBtn.addEventListener("click", rmCat, true);
+	addBtn = document.getElementById("addCatBtn");
+	addBtn.addEventListener("click", sendCat, true);
+	
+	addXBtn = document.getElementById("addXBtn");
+	addXBtn.addEventListener("click", sendTransaction, true);
 
 	addCat = document.getElementById("addCat");
 	selectCat = document.getElementById("delCat");
 	xSelectCat = document.getElementById("xSelectCat");
+	
 	delCatDiv = document.getElementById("delCatDiv");
 	delXDiv = document.getElementById("delXDiv");
+	
+	xName = document.getElementById("xName");
+	xDate = document.getElementById("xDate");
+	xTotal = document.getElementById("xTotal");
+	
 	updatePage();
 }
 
@@ -77,14 +79,19 @@ function handleSendCat(httpRequest, cat) {
 	if (httpRequest.readyState === XMLHttpRequest.DONE) {
 		if (httpRequest.status === 201) {
 			addCat.value = "";
+			
 			var option = document.createElement("option");
+			var option2 = document.createElement("option");
 			option.text = cat;
+			option2.text = cat;
 			option.value = selectCat.length;
+			option2.value = xSelectCat.length;
+			
 			selectCat.add(option);
-			xSelectCat.add(option);
+			xSelectCat.add(option2);
 			updatePage();
 		} else {
-			alert("There was a problem with the put request.");
+			alert("There was a problem with the post request.");
 		}
 		logStatus(httpRequest);
 	}
@@ -117,6 +124,44 @@ function handleRmCat(httpRequest, cat) {
 			updatePage();
 		} else {
 			alert("There was a problem with the delete request.");
+		}
+		logStatus(httpRequest);
+	}
+}
+
+function sendTransaction() {
+	var httpRequest = new XMLHttpRequest();
+
+	var name = xName.value;
+	var date = xDate.value;
+	var total = xTotal.value;
+	var cat = xSelectCat.options[xSelectCat.selectedIndex].text;
+
+	httpRequest.onreadystatechange = function() { handleSendTransaction(httpRequest) };
+
+	httpRequest.open("PUT", "/api/transactions", true);
+	httpRequest.setRequestHeader('Content-Type', 'application/json');
+
+	var data = new Object();
+	data.name = name;
+	data.date = date;
+	data.total = total;
+	data.category = cat;
+	data = JSON.stringify(data);
+
+	httpRequest.send(data);
+}
+
+function handleSendTransaction(httpRequest) {
+	if (httpRequest.readyState === XMLHttpRequest.DONE) {
+		if (httpRequest.status === 201) {	
+			xName.value = "";
+			xDate.value = "";
+			xTotal.value = "";
+			xSelectCat.selectedIndex = 0;
+			updatePage();
+		} else {
+			alert("There was a problem with the put request.");
 		}
 		logStatus(httpRequest);
 	}
