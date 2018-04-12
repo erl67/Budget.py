@@ -28,13 +28,16 @@
 {% endblock %}
 
     <a href="{{ url_for('index') }}">index</a>
-    <a href="{{ url_for('rawstats') }}">raw data</a>
     
+    <span class="d-block">
     <a href="{{ url_for('cats') }}">c</a>
     <a href="{{ url_for('trans') }}">t</a>
-    <a href="{{ url_for('budgetall')}}">b</a>
+    </span>
+    {% if g.categories == {} %}
+        <a href="{{ url_for('read_data')}}">load data</a>
+	{% endif %}
+    
     <a href="{{ url_for('save_data')}}">save data</a>
-    <a href="{{ url_for('read_data')}}">load data</a>
     
 </div>
 

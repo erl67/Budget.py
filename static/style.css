@@ -50,13 +50,11 @@ li {
 	flex-direction: row;
 }
 .flashes {
-	margin-top: 0;
-	margin-left: 1em;
 	margin-bottom: 3em;
 	font-variant: small-caps;
 	box-shadow:0px 0px 3em 2em #b06259 ;
 	padding: 1.5em;
-	list-style-type: circle;
+	border-radius: 1em;
 }
 input, select {
 	margin-top: 1em;
