@@ -37,9 +37,10 @@
 </div>
 
 <div class="text-center col-7 offset-4 d-none" id="delXDiv">
-	<select name="delCat" id="delCat">
+	<select name="delX" id="delX">
+    	<option value="" disabled selected>Transaction</option>
 		{% for c in g.transactions %}
-	    	<option value="{{ c }}">{{ g.transactions[c] | striptags}}</option>
+	    	<option value="{{ c }}">{{ g.transactions[c]['name'] +" - "+ g.transactions[c]['total'] +" - "+ g.transactions[c]['date'] +" - "+ g.transactions[c]['category']  }}</option>
 		{% endfor %} 
 	</select><br/>
 	<button class="btn btn-warning" name="delXBtn" id="delXBtn" type="button">Remove Transaction</button>

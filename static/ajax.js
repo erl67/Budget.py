@@ -18,10 +18,13 @@ function prepare() {
 	
 	addXBtn = document.getElementById("addXBtn");
 	addXBtn.addEventListener("click", sendTransaction, true);
+	delXBtn = document.getElementById("delXBtn");
+	delXBtn.addEventListener("click", rmTransaction, true);
 
 	addCat = document.getElementById("addCat");
 	selectCat = document.getElementById("delCat");
 	xSelectCat = document.getElementById("xSelectCat");
+	xSelectDel = document.getElementById("delX");
 	
 	delCatDiv = document.getElementById("delCatDiv");
 	delXDiv = document.getElementById("delXDiv");
@@ -57,6 +60,32 @@ function handleGetCats(httpRequest) {
 		logStatus(httpRequest);
 	}
 }
+
+function getTransactions() {
+	var httpRequest = new XMLHttpRequest();
+
+	httpRequest.onreadystatechange = function() { handleGetTransactions(httpRequest) };
+
+	httpRequest.open("GET", "/api/transactions", true);
+	httpRequest.setRequestHeader('Content-Type', 'application/json');
+
+	httpRequest.send();
+}
+
+function handleGetTransactions(httpRequest) {
+	if (httpRequest.readyState === XMLHttpRequest.DONE) {
+		if (httpRequest.status === 200) {
+	        transactions = httpRequest.responseText;
+	        if (transactions.length > 5)
+	        	delXDiv.classList.remove("d-none");
+	        else delXDiv.classList.add("d-none");
+		} else {
+			alert("There was a problem with the get request.");
+		}
+		logStatus(httpRequest);
+	}
+}
+
 
 function sendCat() {
 	var httpRequest = new XMLHttpRequest();
@@ -103,7 +132,7 @@ function rmCat() {
 	var cat = selectCat.value;
 	
 	if (cat) {
-		httpRequest.onreadystatechange = function() { handleRmCat(httpRequest, cat) };
+		httpRequest.onreadystatechange = function() { handleRmCat(httpRequest) };
 	
 		httpRequest.open("DELETE", "/api/cats", true);
 		httpRequest.setRequestHeader('Content-Type', 'application/json');
@@ -116,11 +145,42 @@ function rmCat() {
 	}
 }
 
-function handleRmCat(httpRequest, cat) {
+function handleRmCat(httpRequest) {
 	if (httpRequest.readyState === XMLHttpRequest.DONE) {
 		if (httpRequest.status === 204) {
 			selectCat.remove(selectCat.selectedIndex);
 			xSelectCat.remove(selectCat.selectedIndex);
+			updatePage();
+		} else {
+			alert("There was a problem with the delete request.");
+		}
+		logStatus(httpRequest);
+	}
+}
+
+function rmTransaction() {
+	var httpRequest = new XMLHttpRequest();
+
+	var transact = delX.value;
+	
+	if (transact) {
+		httpRequest.onreadystatechange = function() { handleRmTransaction(httpRequest, transact) };
+	
+		httpRequest.open("DELETE", "/api/transaction", true);
+		httpRequest.setRequestHeader('Content-Type', 'application/json');
+	
+		var data = new Object();
+		data.transaction = transact;
+		data = JSON.stringify(data);
+	
+		httpRequest.send(data);
+	}
+}
+
+function handleRmTransaction(httpRequest, transact) {
+	if (httpRequest.readyState === XMLHttpRequest.DONE) {
+		if (httpRequest.status === 204) {
+			xDel.remove(xDel.selectedIndex);
 			updatePage();
 		} else {
 			alert("There was a problem with the delete request.");
@@ -168,12 +228,16 @@ function handleSendTransaction(httpRequest) {
 }
 
 function logStatus(xhr) {
-	console.log("📡\t" + xhr.status + "\t" + xhr.responseText);
+	if (xhr.responseText) {
+		console.log("📡\t" + xhr.status + "\n" + JSON.stringify(JSON.parse(xhr.responseText)));
+	} else {
+		console.log("📡\t" + xhr.status + "\t🛰️" + xhr.responseText);
+	}
 }
 
 function updatePage() {
 	getCats();
-
+	getTransactions();
 	colorize(['page']);
 	colorizeText(['page'], true);
 }

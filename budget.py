@@ -60,6 +60,11 @@ class trans(Resource):
         flash("transaction added")
         return {}, 201
     
+    def delete(self):
+#         del categories[category]
+        flash("transaction removed")
+        return {}, 204
+    
 api.add_resource(cats, '/api/cats')
 api.add_resource(trans, '/api/transactions')
     
