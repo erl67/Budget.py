@@ -16,11 +16,12 @@ categories = dict()
 apiKeys = ['erl67api', 'test']
 auth = False
 
+
 def create_app():
     app = Flask(__name__)
     
     app.config.update(dict(
-        SECRET_KEY='erl67_',
+        SECRET_KEY='erl67',
         TEMPLATES_AUTO_RELOAD=True,
         USE_THREADED = True,
     ))
@@ -34,8 +35,7 @@ api = Api(app)
 def require_apikey(view_function):  #coderwall.com/p/4qickw/require-an-api-key-for-a-route-in-flask-using-only-a-decorator
     @wraps(view_function)
     def decorated_function(*args, **kwargs):
-        global auth
-        if auth == True:
+        if (request.args.get('key') and request.args.get('key') in apiKeys) or (session.get('apiKey') in apiKeys):
             return view_function(*args, **kwargs)
         else:
             abort(401)
@@ -83,35 +83,40 @@ class trans(Resource):
     
     @require_apikey
     def delete(self):
-#         del categories[category]
-        flash("transaction removed")
+        transaction = request.json['transaction']
+        eprint(str(transaction))
+        if transaction in transactions:
+            del transactions[transaction]
+            flash("transaction removed")
+        else:
+            flash("nothing to remove")
         return {}, 204
     
 api.add_resource(cats, '/api/cats')
 api.add_resource(trans, '/api/transactions')
-
     
 @app.before_request
 def before_request():
-    1 if session.get('requests') == None else int(session['requests']) + 1
+    session['requests'] = int(session.get('requests') or 0)+1
+    g.session = session
     g.transactions = transactions
     g.categories = categories
     eprint("g.cats: " + str(g.categories), end="\t")
     eprint("g.trans: " + str(g.transactions), end="\n\n")
-
         
 @app.before_first_request
 def before_first_request():
     global auth
-    1 if session.get('starts') == None else int(session['starts']) + 1
+    session['starts'] = int(session.get('starts') or 0)+1
     if session.get('apiKey') in apiKeys:
         auth = True
-    else:
-        session['apiKey'] = 'erl67api'
-        auth = True
+#     else:
+#         session['apiKey'] = 'erl67api'
+#         auth = True
     eprint("\t🥇 \t\t" + str(auth))
 
 @app.route("/save")
+@require_apikey
 def save_data():
     with open('data/categories.p', 'wb') as fh:
         pickle.dump(g.categories, fh)
@@ -121,6 +126,7 @@ def save_data():
     return redirect(url_for("index"))
 
 @app.route("/open")
+@require_apikey
 def read_data():
     global categories, transactions
     with open('data/categories.p', 'rb') as fh:
@@ -128,6 +134,14 @@ def read_data():
     with open('data/transactions.p', 'rb') as fh:
         transactions = pickle.load(fh)
     flash("Data loaded from file")
+    return redirect(url_for("index"))
+
+@app.route("/setkey")
+def setkey():
+    if bool(getrandbits(1))==True:
+        session['apiKey'] = apiKeys[0]
+    else:
+        session['apiKey'] = apiKeys[1]
     return redirect(url_for("index"))
 
 @app.route('/')
@@ -142,10 +156,6 @@ def review():
 @app.errorhandler(404)
 def page_not_found(error):
     return Response(render_template('404.html', errno=error), status=404, mimetype='text/html')
-
-# @app.errorhandler(405)
-# def wrong_method(error):
-#     return Response("You shouldn't have done that", status=405, mimetype='text/html')
 
 @app.route('/418/')
 def err418(error=None):

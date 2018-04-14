@@ -49,6 +49,7 @@ input, select, option {
 	padding: .3em;
 	text-align: center;
 	text-align-last: center;
+	width: 100%;
 }
 input:focus {
 	background-color: rgba(239, 238, 203, 0.9);

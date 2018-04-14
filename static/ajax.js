@@ -3,6 +3,7 @@ var buttons, addBtn, delBtn, addXBtn, delXBtn;
 var delCatDiv, addCat, selectCat;
 var delXDiv, xSelectCat, xName, xDate, xTotal;
 var categories, transactions;
+let key = {'key' : 'test'}
 
 document.addEventListener("DOMContentLoaded", function() {
 	window.onload = prepare;
@@ -51,10 +52,15 @@ function handleGetCats(httpRequest) {
 	if (httpRequest.readyState === XMLHttpRequest.DONE) {
 		if (httpRequest.status === 200) {
 	        categories = httpRequest.responseText;
-	        if (categories.length > 5)
+	        if (categories.length > 5) {
 	        	delCatDiv.classList.remove("d-none");
-	        else delCatDiv.classList.add("d-none");
-		} else {
+		        addXDiv.classList.remove("d-none");
+	        } else {
+	        	delCatDiv.classList.add("d-none");
+		        addXDiv.classList.add("d-none");
+	        }
+		} else if (httpRequest.status === 401) {}
+		else {
 			alert("There was a problem with the get request.");
 		}
 		logStatus(httpRequest);
@@ -79,7 +85,8 @@ function handleGetTransactions(httpRequest) {
 	        if (transactions.length > 5)
 	        	delXDiv.classList.remove("d-none");
 	        else delXDiv.classList.add("d-none");
-		} else {
+		} else if (httpRequest.status === 401) {}
+		else {
 			alert("There was a problem with the get request.");
 		}
 		logStatus(httpRequest);
@@ -166,7 +173,7 @@ function rmTransaction() {
 	if (transact) {
 		httpRequest.onreadystatechange = function() { handleRmTransaction(httpRequest, transact) };
 	
-		httpRequest.open("DELETE", "/api/transaction", true);
+		httpRequest.open("DELETE", "/api/transactions", true);
 		httpRequest.setRequestHeader('Content-Type', 'application/json');
 	
 		var data = new Object();
@@ -180,7 +187,7 @@ function rmTransaction() {
 function handleRmTransaction(httpRequest, transact) {
 	if (httpRequest.readyState === XMLHttpRequest.DONE) {
 		if (httpRequest.status === 204) {
-			xDel.remove(xDel.selectedIndex);
+			xSelectDel.remove(xSelectDel.selectedIndex);
 			updatePage();
 		} else {
 			alert("There was a problem with the delete request.");

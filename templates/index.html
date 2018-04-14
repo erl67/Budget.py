@@ -4,26 +4,25 @@
 {% block head %}{% endblock %}
 
 {% block body %}
-	<div class="text-center col-7 offset-4" id="addCatDiv">
-		<input type="text" name="addCat" id="addCat" minlength="1" maxlength="50" placeholder="Category" required/></input>
-		<br/>
-		<button class="btn btn-success" name="addCatBtn" id="addCatBtn" type="button">Add Category</button>
-	</div>
-	
-{#    {% if g.categories != {} %}#}
-	<div class="text-center col-7 offset-4 d-none" id="delCatDiv">
-	    <select name="delCat" id="delCat">
-        <option value="" disabled selected>Category</option>
-		{% for c in g.categories %}
-	    	<option value="{{ c }}">{{ g.categories[c] | striptags}}</option>
-		{% endfor %} 
-		</select><br/>
-		<button class="btn btn-warning" name="delCatBtn" id="delCatBtn" type="button">Remove Category</button>
-		
-	</div>
-{#	{% endif %}#}
 
-<div class="text-center col-7 offset-4" id="addXDiv">
+<div class="text-center col-7 offset-4" id="addCatDiv">
+	<input type="text" name="addCat" id="addCat" minlength="1" maxlength="50" placeholder="Category" required/></input>
+	<br/>
+	<button class="btn btn-success" name="addCatBtn" id="addCatBtn" type="button">Add Category</button>
+</div>
+	
+<div class="text-center col-7 offset-4 d-none" id="delCatDiv">
+    <select name="delCat" id="delCat">
+    <option value="" disabled selected>Category</option>
+	{% for c in g.categories %}
+    	<option value="{{ c }}">{{ g.categories[c] | striptags}}</option>
+	{% endfor %} 
+	</select><br/>
+	<button class="btn btn-warning" name="delCatBtn" id="delCatBtn" type="button">Remove Category</button>
+	
+</div>
+
+<div class="text-center col-7 offset-4 d-none" id="addXDiv">
 			<input type="text" name="xName" id="xName" minlength="5" maxlength="100" placeholder="Transaction Details" required/><br/>
 			<input type="date" name="xDate" id="xDate" placeholder="Date (mm/dd/yyyy)" required/><br/>
 			<input type="number" name="xTotal" id="xTotal" placeholder="Amount" required/><br/>
