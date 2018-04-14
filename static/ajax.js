@@ -190,26 +190,31 @@ function handleRmTransaction(httpRequest, transact) {
 }
 
 function sendTransaction() {
-	var httpRequest = new XMLHttpRequest();
-
 	var name = xName.value;
 	var date = xDate.value;
 	var total = xTotal.value;
 	var cat = xSelectCat.options[xSelectCat.selectedIndex].text;
-
-	httpRequest.onreadystatechange = function() { handleSendTransaction(httpRequest) };
-
-	httpRequest.open("PUT", "/api/transactions", true);
-	httpRequest.setRequestHeader('Content-Type', 'application/json');
-
+	cat = cat === 'Category' ? undefined : cat;
+	
 	var data = new Object();
 	data.name = name;
 	data.date = date;
 	data.total = total;
 	data.category = cat;
-	data = JSON.stringify(data);
+	
+	if (isEmpty(data) == false) {
+		alert("cannot leave anything blank")
+	} else {
+		data = JSON.stringify(data);
+		
+		var httpRequest = new XMLHttpRequest();
 
-	httpRequest.send(data);
+		httpRequest.onreadystatechange = function() { handleSendTransaction(httpRequest) };
+
+		httpRequest.open("PUT", "/api/transactions", true);
+		httpRequest.setRequestHeader('Content-Type', 'application/json');
+		httpRequest.send(data);
+	}
 }
 
 function handleSendTransaction(httpRequest) {
@@ -233,6 +238,13 @@ function logStatus(xhr) {
 	} else {
 		console.log("📡\t" + xhr.status + "\t🛰️" + xhr.responseText);
 	}
+}
+
+function isEmpty(obj) {
+	for (var o in obj) {
+		if (obj[o] === undefined) return false;
+	}
+	return true;
 }
 
 function updatePage() {
