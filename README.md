@@ -17,7 +17,7 @@ Pitt ID: Erl67@pitt.edu
 
 3. Left hand side has controls to let you load data from a file, along with save data. The link to load data will only display if no categories exist. You will have to delete them all if you want to reload from file. Save will save all of the current data to a file, overwriting what is there. The saved data is stored as a pickle.
 
-4. Api routes for get are:
+4. Api routes for get are:  
 ..-Categories: '/c', '/api/cats', '/api/cats/<int:cat>'
 ..-Transactions: '/t', '/api/transactions', '/api/transactions/<int:transaction>', '/api/transactions/<int:transaction>&value=<val>
 
