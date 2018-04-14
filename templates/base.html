@@ -8,7 +8,6 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
 <link rel="stylesheet" type="text/css" href="/static/style.css?{{ range(0, 99999) | random  }}">
 <script src="/static/color.js" type="text/javascript"></script>
-<script src="/static/ajax.js?{{ range(0, 99999) | random  }}" type="text/javascript"></script>
 <title>{% block title %}ERL67 Budgeting{% endblock %}</title>
 {% block head %}
 {% endblock %}
@@ -30,21 +29,21 @@
     <a href="{{ url_for('index') }}" class="lead">input data</a>
     <a href="{{ url_for('review') }}" class="lead mb-5">analysis</a>
     
-    <span class="d-none">
-    <a href="{{ url_for('cats') }}">c</a>
-    <a href="{{ url_for('trans') }}">t</a>
-    </span>
     {% if g.categories == {} %}
         <a href="{{ url_for('read_data')}}">load data</a>
 	{% endif %}
-    
-    <a href="{{ url_for('save_data')}}">save data</a>
+    <a href="{{ url_for('save_data')}}" class="mb-5">save data</a>
 
+    <span class="d-block text-monospace mt-5 mb-3">
+	    <a href="{{ url_for('cats') }}">c</a>
+	    <a href="{{ url_for('trans') }}">t</a>
+    </span>
+    
     <span class="text-monospace text-left mt-5">{{g.session}}</span>
 </div>
 
 {% if not g.session['apiKey'] %}
-    <p class="h1 text-center mt-5 mb-5"><a href="{{ url_for('setkey') }}">set api key</a></p>
+    <p class="display-1 text-center mt-5 mb-5"><a href="{{ url_for('setkey') }}">set api key</a></p>
     <div id="page-main" class="col-8 offset-3 d-none">
 {% else %}
 <div id="page-main" class="col-8 offset-3">

@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block title %}{% endblock %}
-{% block head %}{% endblock %}
+{% block head %}
+<script src="/static/ajax.js?{{ range(0, 99999) | random  }}" type="text/javascript"></script>
+{% endblock %}
 
 {% block body %}
 
@@ -23,16 +25,16 @@
 </div>
 
 <div class="text-center col-7 offset-4 d-none" id="addXDiv">
-			<input type="text" name="xName" id="xName" minlength="5" maxlength="100" placeholder="Transaction Details" required/><br/>
-			<input type="date" name="xDate" id="xDate" placeholder="Date (mm/dd/yyyy)" required/><br/>
-			<input type="number" name="xTotal" id="xTotal" placeholder="Amount" required/><br/>
-		    <select name="xSelectCat" id="xSelectCat">
-	        <option value="" disabled selected>Category</option>
-			{% for c in g.categories %}
-		    	<option value="{{ c }}">{{ g.categories[c] | striptags}}</option>
-			{% endfor %} 
-			</select><br/>
-			<button class="btn btn-success" name="addXBtn" id="addXBtn">Add Transaction</button>
+	<input type="text" name="xName" id="xName" minlength="5" maxlength="100" placeholder="Transaction Details" required/><br/>
+	<input type="date" name="xDate" id="xDate" placeholder="Date (mm/dd/yyyy)" required/><br/>
+	<input type="number" name="xTotal" id="xTotal" placeholder="Amount" required/><br/>
+    <select name="xSelectCat" id="xSelectCat">
+    <option value="" disabled selected>Category</option>
+	{% for c in g.categories %}
+    	<option value="{{ c }}">{{ g.categories[c] | striptags}}</option>
+	{% endfor %} 
+	</select><br/>
+	<button class="btn btn-success" name="addXBtn" id="addXBtn">Add Transaction</button>
 </div>
 
 <div class="text-center col-7 offset-4 d-none" id="delXDiv">

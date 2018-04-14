@@ -43,9 +43,15 @@ def require_apikey(view_function):  #coderwall.com/p/4qickw/require-an-api-key-f
 
 class cats(Resource):    
     @require_apikey
-    def get(self):
-        return categories, 200
-    
+    def get(self, cat=None):
+        if not cat:
+            return categories, 200
+        else:
+            try:
+                return categories[str(cat)], 200
+            except:
+                abort(404)
+
     @require_apikey
     def post(self):
         category = request.json['category']
@@ -66,8 +72,22 @@ class cats(Resource):
     
 class trans(Resource):
     @require_apikey
-    def get(self):
-        return transactions, 200
+    def get(self, transaction=None, val=None):
+        eprint(str(val))
+        if not transaction:
+            return transactions, 200
+        elif not val:
+            try:
+                result = transactions[str(transaction)]
+                return result, 200
+            except:
+                abort(404)
+        else:
+            try:
+                result = transactions[str(transaction)][str(val)]
+                return result, 200
+            except:
+                abort(404)
     
     @require_apikey
     def put(self):
@@ -92,8 +112,8 @@ class trans(Resource):
             flash("nothing to remove")
         return {}, 204
     
-api.add_resource(cats, '/api/cats')
-api.add_resource(trans, '/api/transactions')
+api.add_resource(cats, '/c', '/api/cats', '/api/cats/<int:cat>')
+api.add_resource(trans, '/t', '/api/transactions', '/api/transactions/<int:transaction>', '/api/transactions/<int:transaction>&value=<val>')
     
 @app.before_request
 def before_request():
@@ -110,9 +130,6 @@ def before_first_request():
     session['starts'] = int(session.get('starts') or 0)+1
     if session.get('apiKey') in apiKeys:
         auth = True
-#     else:
-#         session['apiKey'] = 'erl67api'
-#         auth = True
     eprint("\t🥇 \t\t" + str(auth))
 
 @app.route("/save")
