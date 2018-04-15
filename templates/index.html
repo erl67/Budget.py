@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{% endblock %}
+{% block title %}Add Data - {{super()}}{% endblock %}
 {% block head %}
 <script src="/static/ajax.js?{{ range(0, 99999) | random  }}" type="text/javascript"></script>
 {% endblock %}
@@ -47,7 +47,4 @@
 	<button class="btn btn-warning" name="delXBtn" id="delXBtn" type="button">Remove Transaction</button>
 </div>
 
-{% endblock %}
-
-{% block script %}
 {% endblock %}

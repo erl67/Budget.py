@@ -27,9 +27,6 @@ a:hover {
 	text-decoration: none;
 	border-radius: 1em;
 }
-.transaction-list {
-	border: 1px dashed #c0c0c0;
-}
 ul, li {
 	display: flex; 
 	flex-direction: column;

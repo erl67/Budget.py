@@ -34,12 +34,12 @@
 	{% endif %}
     <a href="{{ url_for('save_data')}}" class="mb-5">save data</a>
 
-    <span class="d-block text-monospace mt-5 mb-3">
+    <span class="d-block text-center text-monospace mt-5" alt="{{g.session}}">
 	    <a href="{{ url_for('cats') }}">c</a>
 	    <a href="{{ url_for('trans') }}">t</a>
+        <span class="d-flex small text-left mt-3">{{g.session}}</span>
     </span>
     
-    <span class="text-monospace text-left mt-5">{{g.session}}</span>
 </div>
 
 {% if not g.session['apiKey'] %}
@@ -56,8 +56,6 @@
 <script type='text/javascript'>
 {% block script %}
 {% endblock %}
-	colorize(['page']);
-	colorizeText(['page'], true);
 </script>
 </body>
 </html>

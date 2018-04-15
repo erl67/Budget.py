@@ -7,15 +7,12 @@ from functools import wraps
 from flask import Flask, g, send_from_directory, flash, render_template, abort, request, redirect, url_for, Response, session
 from flask_restful import Resource, Api
 from flask_debugtoolbar import DebugToolbarExtension
-# from datetime import datetime, date, timedelta
-# from dateutil import parser
 from random import getrandbits
 
 transactions = dict()
 categories = dict()
-apiKeys = ['erl67api', 'test']
+apiKeys = ['erl67api', 'test', 'random', 'key4']
 auth = False
-
 
 def create_app():
     app = Flask(__name__)
@@ -73,7 +70,6 @@ class cats(Resource):
 class trans(Resource):
     @require_apikey
     def get(self, transaction=None, val=None):
-        eprint(str(val))
         if not transaction:
             return transactions, 200
         elif not val:
@@ -92,7 +88,7 @@ class trans(Resource):
     @require_apikey
     def put(self):
         transact = dict()
-        transact['name'] = request.json['name']
+        transact['name'] = remove_tags(request.json['name'])
         transact['date'] = request.json['date']
         transact['total'] = request.json['total']
         transact['category'] = request.json['category']
@@ -117,7 +113,7 @@ api.add_resource(trans, '/t', '/api/transactions', '/api/transactions/<int:trans
     
 @app.before_request
 def before_request():
-    session['requests'] = int(session.get('requests') or 0)+1
+    session['requests'] = int(session.get('requests') or 0) + 1
     g.session = session
     g.transactions = transactions
     g.categories = categories
@@ -127,7 +123,7 @@ def before_request():
 @app.before_first_request
 def before_first_request():
     global auth
-    session['starts'] = int(session.get('starts') or 0)+1
+    session['starts'] = int(session.get('starts') or 0) + 1
     if session.get('apiKey') in apiKeys:
         auth = True
     eprint("\t🥇 \t\t" + str(auth))
@@ -154,11 +150,8 @@ def read_data():
     return redirect(url_for("index"))
 
 @app.route("/setkey")
-def setkey():
-    if bool(getrandbits(1))==True:
-        session['apiKey'] = apiKeys[0]
-    else:
-        session['apiKey'] = apiKeys[1]
+def setkey(k=int(getrandbits(2))):
+    session['apiKey'] = apiKeys[k]
     return redirect(url_for("index"))
 
 @app.route('/')
