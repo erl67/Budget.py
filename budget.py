@@ -117,8 +117,8 @@ def before_request():
     g.session = session
     g.transactions = transactions
     g.categories = categories
-    eprint("g.cats: " + str(g.categories), end="\t")
-    eprint("g.trans: " + str(g.transactions), end="\n\n")
+#     eprint("g.cats: " + str(g.categories), end="\t")
+#     eprint("g.trans: " + str(g.transactions), end="\n\n")
         
 @app.before_first_request
 def before_first_request():
@@ -150,7 +150,9 @@ def read_data():
     return redirect(url_for("index"))
 
 @app.route("/setkey")
-def setkey(k=int(getrandbits(2))):
+def setkey(k=getrandbits(2)):
+    for i in range(0,10):
+        eprint(str(getrandbits(2)), end=" ")
     session['apiKey'] = apiKeys[k]
     return redirect(url_for("index"))
 
@@ -162,21 +164,18 @@ def index():
 def review():
     return Response(render_template('analysis.html'), status=200, mimetype='text/html')
 
+@app.route('/404/')
 @app.errorhandler(403)
 @app.errorhandler(404)
-def page_not_found(error):
+def page_not_found(error=None):
     return Response(render_template('404.html', errno=error), status=404, mimetype='text/html')
-
-@app.route('/418/')
-def err418(error=None):
-    return Response(render_template('404.html', errno=error), status=418, mimetype='text/html')
 
 @app.route('/favicon.ico') 
 def favicon():
     if bool(getrandbits(1))==True:
-        return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
-    else:
         return send_from_directory(os.path.join(app.root_path, 'static'), 'faviconF.ico', mimetype='image/vnd.microsoft.icon')
+    else:
+        return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 def eprint(*args, **kwargs):
     print(*args, file=stderr, **kwargs)
@@ -185,12 +184,6 @@ TAG_RE = re.compile(r'<[^>]+>')
 def remove_tags(text):
     return TAG_RE.sub('', text)
 
-# def json_serial(obj):
-#     """JSON serializer for objects not serializable by default json code stackoverflow.com/a/22238613/7491839 """
-#     if isinstance(obj, (datetime, date)):
-#         return obj.isoformat()
-#     raise TypeError ("Type %s not serializable" % type(obj))
-    
 if __name__ == "__main__":
     print('Starting......')
     if FDEBUG==True:

@@ -43,15 +43,14 @@
 </div>
 
 {% if not g.session['apiKey'] %}
-    <p class="display-1 text-center mt-5 mb-5"><a href="{{ url_for('setkey') }}">set api key</a></p>
+    <p class="display-1 text-center mt-5 col-8 offset-3" title="you have no choice"><a href="{{ url_for('setkey') }}">set api key</a></p>
     <div id="page-main" class="col-8 offset-3 d-none">
 {% else %}
-<div id="page-main" class="col-8 offset-3">
+	<div id="page-main" class="col-8 offset-3">
 {% endif %}
 	{% block body %}
 	{% endblock %}
 </div>
-
 
 <script type='text/javascript'>
 {% block script %}
