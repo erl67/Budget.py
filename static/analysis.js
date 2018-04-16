@@ -41,8 +41,13 @@ function transactionNames(arr) {
 
 function populateCats(arr) {
 	temp = Object.keys(arr).map(function(key, index) {
-		return arr[key];
+		console.log(key);
+		return key;
 	});
+//	temp = Object.keys(arr).map(function(key, index) {
+//		console.log(arr);
+//		return arr[key];
+//	});
 	temp = temp.sort().toString().replace(/,/g, ',  ');
 	catsDiv.innerHTML += temp;
 }

@@ -102,6 +102,7 @@ function sendCat() {
 	var httpRequest = new XMLHttpRequest();
 
 	var cat = addCat.value;
+	var amount = catAmount.value;
 
 	httpRequest.onreadystatechange = function() {
 		handleSendCat(httpRequest, cat)
@@ -112,6 +113,7 @@ function sendCat() {
 
 	var data = new Object();
 	data.category = cat;
+	data.amount = amount;
 	data = JSON.stringify(data);
 
 	httpRequest.send(data);
@@ -126,8 +128,8 @@ function handleSendCat(httpRequest, cat) {
 			var option2 = document.createElement("option");
 			option.text = cat;
 			option2.text = cat;
-			option.value = selectCat.length;
-			option2.value = xSelectCat.length;
+			option.value = cat; //selectCat.length;
+			option2.value = cat //xSelectCat.length;
 
 			selectCat.add(option);
 			xSelectCat.add(option2);
@@ -163,8 +165,9 @@ function rmCat() {
 function handleRmCat(httpRequest) {
 	if (httpRequest.readyState === XMLHttpRequest.DONE) {
 		if (httpRequest.status === 204) {
-			selectCat.remove(selectCat.selectedIndex);
 			xSelectCat.remove(selectCat.selectedIndex);
+			selectCat.remove(selectCat.selectedIndex);
+//			xSelectCat.remove(selectCat.value)
 			updatePage();
 		} else {
 			alert("There was a problem with the delete request.");

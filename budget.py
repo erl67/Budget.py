@@ -51,11 +51,11 @@ class cats(Resource):
 
     @require_apikey
     def post(self):
-        category = request.json['category']
-        eprint(str(category))
-        if category not in categories.values():
-            categories[str(len(categories))] = category
-            flash("category added : " + str(category))
+        cat = request.json['category']
+        amt = request.json['amount']
+        if cat not in categories.keys():
+            categories[cat] = amt
+            flash("category added : " + str(cat))
         else:
             flash("category already exists")
         return {}, 201
@@ -117,7 +117,7 @@ def before_request():
     g.session = session
     g.transactions = transactions
     g.categories = categories
-#     eprint("g.cats: " + str(g.categories), end="\t")
+    eprint("g.cats: " + str(g.categories), end="\t")
 #     eprint("g.trans: " + str(g.transactions), end="\n\n")
         
 @app.before_first_request
