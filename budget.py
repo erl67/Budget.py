@@ -3,13 +3,15 @@ FDEBUG = True
 
 import os, re, json, pickle
 from sys import stderr
+from collections import OrderedDict
 from functools import wraps
 from flask import Flask, g, send_from_directory, flash, render_template, abort, request, redirect, url_for, Response, session
 from flask_restful import Resource, Api
 from flask_debugtoolbar import DebugToolbarExtension
 from random import getrandbits
 
-transactions = dict()
+# transactions = dict()
+transactions = OrderedDict()
 categories = dict()
 apiKeys = ['erl67api', 'test', 'random', 'key4']
 auth = False
@@ -92,8 +94,16 @@ class trans(Resource):
         transact['date'] = request.json['date']
         transact['total'] = request.json['total']
         transact['category'] = request.json['category']
-        eprint(str(transact))
-        transactions[str(len(transactions))] = transact
+        #transactions.update(transact)
+        x = len(transactions)
+        eprint("x " + str(x))
+        if x > 1: 
+            y = int(list(transactions.keys())[-1])
+            eprint("y " + str(y))
+            y += 1
+            transactions[str(y)] = transact
+        else:
+            transactions[str(x)] = transact
         flash("transaction added")
         return {}, 201
     
@@ -102,7 +112,8 @@ class trans(Resource):
         transaction = request.json['transaction']
         eprint(str(transaction))
         if transaction in transactions:
-            del transactions[transaction]
+            #del transactions[transaction]
+            transactions.pop(transaction)
             flash("transaction removed")
         else:
             flash("nothing to remove")
@@ -118,7 +129,7 @@ def before_request():
     g.transactions = transactions
     g.categories = categories
     eprint("g.cats: " + str(g.categories), end="\t")
-#     eprint("g.trans: " + str(g.transactions), end="\n\n")
+    eprint("g.trans: " + str(g.transactions), end="\n\n")
         
 @app.before_first_request
 def before_first_request():

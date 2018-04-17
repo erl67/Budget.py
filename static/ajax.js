@@ -202,6 +202,7 @@ function handleRmTransaction(httpRequest, transact) {
 		if (httpRequest.status === 204) {
 			xSelectDel.remove(xSelectDel.selectedIndex);
 			updatePage();
+			location.reload(); //only way to make pop work
 		} else {
 			alert("There was a problem with the delete request.");
 		}

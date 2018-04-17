@@ -2,9 +2,11 @@
 //this uses the same AJAX as before, only to GET the data
 //and the response is automatically parsed to JSON
 var categories = {}, transactions = {};
+var cats = Array();
 var catsDiv, totalCatsDiv;
 var totalX, xNames;
-var temp;
+var perCatX, perCatRemaining;
+var temp, temp2;
 
 document.addEventListener("DOMContentLoaded", function() {
 	window.onload = prepare;
@@ -17,18 +19,46 @@ function prepare() {
 	totalCatsDiv = document.getElementById('totalCats');
 	totalX = document.getElementById('totalX');
 	xNames = document.getElementById('xNames');
+	
+	perCatX = document.getElementById('perCatX');
+	perCatRemaining = document.getElementById('perCatRemaining');
 
 	setTimeout(function() {
 		if (categories){
 			populateCats(categories);
 			totalCats(categories);
 		}
-		if (transactions){
+		if (transactions) {
 			totalTransactions(transactions);
 			transactionNames(transactions);
 		}
+		if (categories && transactions) {
+			perCategory(categories, transactions);
+
+		}
 		updatePage();
 	}, 1000);
+}
+
+function perCategory(arr, arrX) {
+	temp = Object.keys(arr);
+	temp = temp.sort();
+	temp2 = Array(temp.length);
+	temp2.fill(0);
+	
+	for (var cat in temp) {
+		Object.keys(arrX).map(function(key, index) {
+			if (arrX[key].category == temp[cat]) {
+				return temp2[cat] = temp2[cat] + 1;
+			}
+		});
+	}
+	
+	for (var cat in temp) {
+		if (temp2[cat] !== 0) {
+			perCatX.innerHTML =  perCatX.innerHTML + '<br/>' + temp[cat] + " = " + temp2[cat];
+ 		}
+	}
 }
 
 function transactionNames(arr) {
@@ -41,15 +71,14 @@ function transactionNames(arr) {
 
 function populateCats(arr) {
 	temp = Object.keys(arr).map(function(key, index) {
-		console.log(key);
 		return key;
 	});
 //	temp = Object.keys(arr).map(function(key, index) {
-//		console.log(arr);
 //		return arr[key];
 //	});
 	temp = temp.sort().toString().replace(/,/g, ',  ');
 	catsDiv.innerHTML += temp;
+	cats = temp;
 }
 
 function totalCats(arr) {
