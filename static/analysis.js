@@ -5,7 +5,7 @@ var categories = {}, transactions = {};
 var cats = Array();
 var catsDiv, totalCatsDiv;
 var totalX, xNames;
-var perCatX, perCatRemaining;
+var perCatX, perCatRemaining, totalPerCatX;
 var temp, temp2;
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -21,6 +21,7 @@ function prepare() {
 	xNames = document.getElementById('xNames');
 	
 	perCatX = document.getElementById('perCatX');
+	totalPerCatX = document.getElementById('totalPerCatX');
 	perCatRemaining = document.getElementById('perCatRemaining');
 
 	setTimeout(function() {
@@ -34,10 +35,66 @@ function prepare() {
 		}
 		if (categories && transactions) {
 			perCategory(categories, transactions);
-
+			totalCategory(categories, transactions);
+			remainingCategory(categories, transactions);
 		}
 		updatePage();
 	}, 1000);
+}
+
+function remainingCategory(arr, arrX) {
+	temp = Object.keys(arr);
+	temp = temp.sort();
+	temp2 = Array(temp.length);
+	temp2.fill(0.0);
+	var temp4;
+	
+	for (var cat in temp) {
+		Object.keys(arrX).map(function(key, index) {
+			if (arrX[key].category == temp[cat]) {
+				return temp2[cat] = temp2[cat] + parseFloat(arrX[key].total);
+			}
+		});
+	}
+	
+	var temp4 = Object.keys(arr).map(function(key, index) {
+		var remainder = parseFloat(arr[key]) - parseFloat(temp2[index]);
+		var s = temp[index] + " ($" +  remainder.toFixed(2) + ")" + "<br>";
+		return s;
+	});
+	
+	console.log(temp4)
+	temp4 = temp4.toString().replace(/,/g, '')
+	
+	perCatRemaining.innerHTML =  perCatRemaining.innerHTML + '<br/>' + temp4;
+
+//	for (var cat in temp) {
+//			remainder = parseFloat(arr[cat]);
+//			console.log ()
+//			//parseFloat(temp2[cat])
+//			perCatRemaining.innerHTML =  perCatRemaining.innerHTML + '<br/>' + temp[cat] + "  -  $" + remainder.toFixed(2);
+//	}
+}
+
+function totalCategory(arr, arrX) {
+	temp = Object.keys(arr);
+	temp = temp.sort();
+	temp2 = Array(temp.length);
+	temp2.fill(0);
+	
+	for (var cat in temp) {
+		Object.keys(arrX).map(function(key, index) {
+			if (arrX[key].category == temp[cat]) {
+				return temp2[cat] = parseFloat(temp2[cat]) + parseFloat(arrX[key].total);
+			}
+		});
+	}
+	
+	for (var cat in temp) {
+		if (temp2[cat] !== 0) {
+			totalPerCatX.innerHTML =  totalPerCatX.innerHTML + '<br/>' + temp[cat] + "  -  $" + parseFloat(temp2[cat]).toFixed(2);
+ 		}
+	}
 }
 
 function perCategory(arr, arrX) {
@@ -71,11 +128,10 @@ function transactionNames(arr) {
 
 function populateCats(arr) {
 	temp = Object.keys(arr).map(function(key, index) {
-		return key;
+		var s = key + " ($" +  parseInt(arr[key]).toFixed(2) + ")";
+		return s;
 	});
-//	temp = Object.keys(arr).map(function(key, index) {
-//		return arr[key];
-//	});
+
 	temp = temp.sort().toString().replace(/,/g, ',  ');
 	catsDiv.innerHTML += temp;
 	cats = temp;

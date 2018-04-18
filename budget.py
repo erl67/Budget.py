@@ -1,5 +1,5 @@
 #erl67
-FDEBUG = True
+FDEBUG = False
 
 import os, re, json, pickle
 from sys import stderr
@@ -10,7 +10,6 @@ from flask_restful import Resource, Api
 from flask_debugtoolbar import DebugToolbarExtension
 from random import getrandbits
 
-# transactions = dict()
 transactions = OrderedDict()
 categories = dict()
 apiKeys = ['erl67api', 'test', 'random', 'key4']
@@ -94,13 +93,9 @@ class trans(Resource):
         transact['date'] = request.json['date']
         transact['total'] = request.json['total']
         transact['category'] = request.json['category']
-        #transactions.update(transact)
         x = len(transactions)
-        eprint("x " + str(x))
         if x > 1: 
-            y = int(list(transactions.keys())[-1])
-            eprint("y " + str(y))
-            y += 1
+            y = int(list(transactions.keys())[-1]) + 1
             transactions[str(y)] = transact
         else:
             transactions[str(x)] = transact
@@ -110,7 +105,7 @@ class trans(Resource):
     @require_apikey
     def delete(self):
         transaction = request.json['transaction']
-        eprint(str(transaction))
+        #eprint(str(transaction))
         if transaction in transactions:
             #del transactions[transaction]
             transactions.pop(transaction)

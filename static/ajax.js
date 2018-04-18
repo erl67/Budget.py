@@ -99,24 +99,31 @@ function handleGetTransactions(httpRequest) {
 }
 
 function sendCat() {
-	var httpRequest = new XMLHttpRequest();
-
 	var cat = addCat.value;
-	var amount = catAmount.value;
+	var amount = catAmount.value== 0 ? 0 : catAmount.value;
 
-	httpRequest.onreadystatechange = function() {
-		handleSendCat(httpRequest, cat)
-	};
+	if (cat) {
+		var data = new Object();
+		data.category = cat;
+		data.amount = amount;
+		console.log(data)
+		
+		data = JSON.stringify(data);
+	
+		var httpRequest = new XMLHttpRequest();
+	
+		httpRequest.onreadystatechange = function() {
+			handleSendCat(httpRequest, cat)
+		};
+	
+		httpRequest.open("POST", "/api/cats", true);
+		httpRequest.setRequestHeader('Content-Type', 'application/json');
+	
+		httpRequest.send(data);
+	} else {
+		alert("cannot leave category blank");
+	}
 
-	httpRequest.open("POST", "/api/cats", true);
-	httpRequest.setRequestHeader('Content-Type', 'application/json');
-
-	var data = new Object();
-	data.category = cat;
-	data.amount = amount;
-	data = JSON.stringify(data);
-
-	httpRequest.send(data);
 }
 
 function handleSendCat(httpRequest, cat) {
@@ -212,7 +219,7 @@ function handleRmTransaction(httpRequest, transact) {
 
 function sendTransaction() {
 	var name = xName.value;
-	var date = xDate.value;
+	var date = xDate.value == undefined ? new Date() : xDate.value;
 	var total = xTotal.value;
 	var cat = xSelectCat.options[xSelectCat.selectedIndex].text;
 	cat = cat === 'Category' ? undefined : cat;
