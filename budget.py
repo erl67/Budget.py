@@ -1,5 +1,5 @@
 #erl67
-FDEBUG = False
+FDEBUG = True
 
 import os, re, json, pickle
 from sys import stderr
@@ -200,6 +200,6 @@ if __name__ == "__main__":
         ))
         app.jinja_env.auto_reload = True
 #         toolbar = DebugToolbarExtension(app) 
-        app.run(use_reloader=True, host='0.0.0.0')
+        app.run(use_reloader=True, host='0.0.0.0', port=8080)
     else:
         app.run()
