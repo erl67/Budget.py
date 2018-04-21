@@ -1,3 +1,0 @@
-Flask_RESTful==0.3.6
-Flask_DebugToolbar==0.10.1
-Flask==0.12.2
