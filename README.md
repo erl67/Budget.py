@@ -1,5 +1,4 @@
-# Name: Eric Laslo
-Pitt ID: Erl67@pitt.edu
+
 
 ## Installation
 
